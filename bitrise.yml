@@ -9,6 +9,31 @@ trigger_map:
   workflow: primary
 workflows:
   deploy:
+    description: >
+      ## How to get a signed APK
+      This workflow contains the **Sign APK** step. To sign your APK all you
+      have to do is to:
+      1. Click on **Code Signing** tab
+      1. Find the **ANDROID KEYSTORE FILE** section
+      1. Click or drop your file on the upload file field
+      1. Fill the displayed 3 input fields:
+       1. **Keystore password**
+       1. **Keystore alias**
+       1. **Private key password**
+      1. Click on **[Save metadata]** button
+      That's it! From now on, **Sign APK** step will receive your uploaded
+      files.
+
+      ## How to get a signed IPA
+      This workflow contains the Certificate and Profile Installer step. To
+      use this you will need to upload your signing certificate and
+      provisioning profile to the codesigning tab. The easiest way to do
+      this is by using the Bitrise codesigndoc tool.
+      https://devcenter.bitrise.io/code-signing/ios-code-signing/collecting-files-with-codesigndoc/
+
+      Alternatively you can replace the Certificate and Profile Installer
+      step with the iOS Autoprovision Step. 
+      https://www.bitrise.io/integrations/steps/ios-auto-provision-appstoreconnect
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
