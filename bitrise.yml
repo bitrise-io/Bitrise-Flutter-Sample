@@ -1,11 +1,11 @@
 ---
 format_version: '8'
-default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: flutter
 trigger_map:
-- push_branch: "*"
+- push_branch: '*'
   workflow: primary
-- pull_request_source_branch: "*"
+- pull_request_source_branch: '*'
   workflow: primary
 workflows:
   deploy:
@@ -22,19 +22,23 @@ workflows:
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
-        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
     - flutter-test@0:
         inputs:
-        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
     - flutter-build@0:
         inputs:
-        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
         - platform: both
+    - sign-apk@1:
+        run_if: '{{getenv "BITRISEIO_ANDROID_KEYSTORE_URL" | ne ""}}'
+        inputs:
+        - use_apk_signer: 'true'
     - xcode-archive@3:
         inputs:
-        - project_path: "$BITRISE_PROJECT_PATH"
-        - scheme: "$BITRISE_SCHEME"
-        - export_method: "$BITRISE_EXPORT_METHOD"
+        - project_path: $BITRISE_PROJECT_PATH
+        - scheme: $BITRISE_SCHEME
+        - export_method: $BITRISE_EXPORT_METHOD
         - configuration: Release
     - deploy-to-bitrise-io@1: {}
     - cache-push@2: {}
@@ -49,24 +53,32 @@ workflows:
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
-        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
     - flutter-test@0:
         inputs:
-        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
     - avd-manager@1: {}
     - wait-for-android-emulator@1: {}
     - script@1:
         inputs:
-        - content: |-
+        - content: >-
             #!/usr/bin/env bash
+
             # fail if any commands fails
+
             set -e
 
+
             echo "Kicking off Flutter Driver e2e testing"
-            flutter driver --target=test_driver/e2e.dart > flutter_driver_tests.log
+
+            flutter driver --target=test_driver/e2e.dart >
+            flutter_driver_tests.log
+
 
             echo "Copying log to deploy directory"
-            cp flutter_driver_tests.log $BITRISE_DEPLOY_DIR/flutter_driver_tests.log
+
+            cp flutter_driver_tests.log
+            $BITRISE_DEPLOY_DIR/flutter_driver_tests.log
         title: Flutter Driver
     - deploy-to-bitrise-io@1: {}
     - cache-push@2: {}
@@ -74,7 +86,7 @@ app:
   envs:
   - opts:
       is_expand: false
-    BITRISE_FLUTTER_PROJECT_LOCATION: "."
+    BITRISE_FLUTTER_PROJECT_LOCATION: .
   - opts:
       is_expand: false
     BITRISE_PROJECT_PATH: ios/Runner.xcworkspace
