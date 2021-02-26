@@ -25,15 +25,11 @@ workflows:
       files.
 
       ## How to get a signed IPA
-      This workflow contains the Certificate and Profile Installer step. To
+      This workflow contains the **Certificate and Profile Installer** step. To
       use this you will need to upload your signing certificate and
       provisioning profile to the codesigning tab. The easiest way to do
-      this is by using the Bitrise codesigndoc tool.
-      https://devcenter.bitrise.io/code-signing/ios-code-signing/collecting-files-with-codesigndoc/
-
-      Alternatively you can replace the Certificate and Profile Installer
-      step with the iOS Autoprovision Step. 
-      https://www.bitrise.io/integrations/steps/ios-auto-provision-appstoreconnect
+      this is by using the Bitrise codesigndoc tool. Alternatively you can replace the Certificate and Profile Installer
+      step with the iOS Autoprovision Step.
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
