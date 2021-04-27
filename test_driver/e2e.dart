@@ -1,5 +1,5 @@
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:Bitrise_Flutter_Sample/main.dart' as app;
+import 'package:bitrise_flutter_sample/main.dart' as app;
 
 void main() {
   // This line enables the extension.
