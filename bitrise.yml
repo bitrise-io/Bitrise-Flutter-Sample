@@ -74,6 +74,7 @@ workflows:
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
+        - fail_severity: warning
         - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
     - flutter-test@0:
         inputs:
