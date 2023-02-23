@@ -48,7 +48,7 @@ workflows:
         - compile_bitcode: 'no'
         - upload_bitcode: 'no'
         - automatic_code_signing: 'off'
-        - distribution_method: "BITRISE_DISTRIBUTION_METHOD"
+        - distribution_method: "$BITRISE_DISTRIBUTION_METHOD"
         - xcconfig_content: |
             DEVELOPMENT_TEAM = $BITRISE_TEAM
             CODE_SIGN_IDENTITY = $BITRISE_CODE_SIGNING_IDENTITY
