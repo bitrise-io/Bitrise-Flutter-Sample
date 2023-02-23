@@ -1,39 +1,25 @@
 ---
-format_version: '8'
-default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
+format_version: '11'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: flutter
 trigger_map:
-- push_branch: '*'
+- push_branch: "*"
   workflow: primary
-- pull_request_source_branch: '*'
+- pull_request_source_branch: "*"
   workflow: primary
 workflows:
   deploy:
-    description: >
-      ## How to get a signed APK
-      This workflow contains the **Sign APK** step. To sign your APK all you
-      have to do is to:
-      1. Click on **Code Signing** tab
-      1. Find the **ANDROID KEYSTORE FILE** section
-      1. Click or drop your file on the upload file field
-      1. Fill the displayed 3 input fields:
+    description: |
+      ## How to get a signed APK This workflow contains the **Sign APK** step. To sign your APK all you have to do is to: 1. Click on **Code Signing** tab 1. Find the **ANDROID KEYSTORE FILE** section 1. Click or drop your file on the upload file field 1. Fill the displayed 3 input fields:
        1. **Keystore password**
        1. **Keystore alias**
        1. **Private key password**
-      1. Click on **[Save metadata]** button
-      That's it! From now on, **Sign APK** step will receive your uploaded
-      files.
-
-      ## How to get a signed IPA
-      This workflow contains the **Certificate and Profile Installer** step. To
-      use this you will need to upload your signing certificate and
-      provisioning profile to the codesigning tab. The easiest way to do
-      this is by using the Bitrise codesigndoc tool. Alternatively you can replace the Certificate and Profile Installer
-      step with the iOS Autoprovision Step.
+      1. Click on **[Save metadata]** button That's it! From now on, **Sign APK** step will receive your uploaded files.
+      ## How to get a signed IPA This workflow contains the **Certificate and Profile Installer** step. To use this you will need to upload your signing certificate and provisioning profile to the codesigning tab. The easiest way to do this is by using the Bitrise codesigndoc tool. Alternatively you can replace the Certificate and Profile Installer step with the iOS Autoprovision Step.
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - git-clone@4: {}
+    - git-clone@6: {}
     - script@1:
         title: Do anything with Script step
     - certificate-and-profile-installer@1: {}
@@ -43,31 +29,39 @@ workflows:
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
-        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
-    - flutter-test@0:
+        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+    - flutter-test@1:
         inputs:
-        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
+        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
     - flutter-build@0:
         inputs:
-        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
+        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
         - platform: both
     - sign-apk@1:
         run_if: '{{getenv "BITRISEIO_ANDROID_KEYSTORE_URL" | ne ""}}'
         inputs:
         - use_apk_signer: 'true'
-    - xcode-archive@3:
+    - xcode-archive@4:
         inputs:
-        - project_path: $BITRISE_PROJECT_PATH
-        - scheme: $BITRISE_SCHEME
-        - export_method: $BITRISE_EXPORT_METHOD
-        - configuration: Release
-    - deploy-to-bitrise-io@1: {}
+        - project_path: "$BITRISE_PROJECT_PATH"
+        - scheme: "$BITRISE_SCHEME"
+        - compile_bitcode: 'no'
+        - upload_bitcode: 'no'
+        - automatic_code_signing: 'off'
+        - distribution_method: "BITRISE_DISTRIBUTION_METHOD"
+        - xcconfig_content: |
+            DEVELOPMENT_TEAM = $BITRISE_TEAM
+            CODE_SIGN_IDENTITY = $BITRISE_CODE_SIGNING_IDENTITY
+            PROVISIONING_PROFILE_SPECIFIER = $BITRISE_PROFILE_ID
+        - verbose_log: 'no'
+        - configuration: Debug
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2: {}
   primary:
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - git-clone@4: {}
+    - git-clone@6: {}
     - flutter-installer@0:
         inputs:
         - is_update: 'false'
@@ -75,40 +69,32 @@ workflows:
     - flutter-analyze@0:
         inputs:
         - fail_severity: warning
-        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
-    - flutter-test@0:
+        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+    - flutter-test@1:
         inputs:
-        - project_location: $BITRISE_FLUTTER_PROJECT_LOCATION
+        - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
     - avd-manager@1: {}
     - wait-for-android-emulator@1: {}
     - script@1:
         inputs:
-        - content: >-
+        - content: |-
             #!/usr/bin/env bash
-
             # fail if any commands fails
-
             set -e
 
-
             echo "Kicking off Flutter Driver e2e testing"
-
-            flutter driver --target=test_driver/e2e.dart >
-            flutter_driver_tests.log
-
+            flutter driver --target=test_driver/e2e.dart > flutter_driver_tests.log
 
             echo "Copying log to deploy directory"
-
-            cp flutter_driver_tests.log
-            $BITRISE_DEPLOY_DIR/flutter_driver_tests.log
+            cp flutter_driver_tests.log $BITRISE_DEPLOY_DIR/flutter_driver_tests.log
         title: Flutter Driver
-    - deploy-to-bitrise-io@1: {}
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2: {}
 app:
   envs:
   - opts:
       is_expand: false
-    BITRISE_FLUTTER_PROJECT_LOCATION: .
+    BITRISE_FLUTTER_PROJECT_LOCATION: "."
   - opts:
       is_expand: false
     BITRISE_PROJECT_PATH: ios/Runner.xcworkspace
@@ -117,7 +103,17 @@ app:
     BITRISE_SCHEME: Runner
   - opts:
       is_expand: false
-    BITRISE_EXPORT_METHOD: development
+    BITRISE_DISTRIBUTION_METHOD: development
+  - opts:
+      is_expand: false
+    BITRISE_TEAM: 72SA8V3WYL
+  - opts:
+      is_expand: false
+    BITRISE_PROFILE_ID: 60cff004-0cf3-401a-9658-229c92516f26
+  - opts:
+      is_expand: false
+    BITRISE_CODE_SIGNING_IDENTITY: Apple Development
 meta:
   bitrise.io:
+    stack: osx-xcode-13.4.x
     machine_type_id: g2.4core
