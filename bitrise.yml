@@ -26,10 +26,18 @@ workflows:
     - flutter-installer@0:
         inputs:
         - is_update: 'false'
+        - version: '3.47.2'
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
         - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+    - script@1:
+        title: Reactivate junitreport for the pinned Dart SDK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -e
+            dart pub global activate junitreport
     - flutter-test@1:
         inputs:
         - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
@@ -65,11 +73,19 @@ workflows:
     - flutter-installer@0:
         inputs:
         - is_update: 'false'
+        - version: '3.47.2'
     - cache-pull@2: {}
     - flutter-analyze@0:
         inputs:
         - fail_severity: warning
         - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
+    - script@1:
+        title: Reactivate junitreport for the pinned Dart SDK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -e
+            dart pub global activate junitreport
     - flutter-test@1:
         inputs:
         - project_location: "$BITRISE_FLUTTER_PROJECT_LOCATION"
@@ -115,5 +131,5 @@ app:
     BITRISE_CODE_SIGNING_IDENTITY: Apple Development
 meta:
   bitrise.io:
-    stack: osx-xcode-13.4.x
+    stack: osx-xcode-26.4.x
     machine_type_id: g2.4core
