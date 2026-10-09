@@ -10,7 +10,7 @@ void main() {
     final counterTextFinder = find.byValueKey('counter');
     final buttonFinder = find.byValueKey('increment');
 
-    FlutterDriver driver;
+    late FlutterDriver driver;
 
     // Connect to the Flutter driver before running any tests.
     setUpAll(() async {
@@ -19,9 +19,7 @@ void main() {
 
     // Close the connection to the driver after the tests have completed.
     tearDownAll(() async {
-      if (driver != null) {
-        driver.close();
-      }
+      await driver.close();
     });
 
     test('starts at 0', () async {
