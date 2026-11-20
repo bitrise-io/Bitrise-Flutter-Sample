@@ -122,10 +122,10 @@ app:
     BITRISE_DISTRIBUTION_METHOD: development
   - opts:
       is_expand: false
-    BITRISE_TEAM: 72SA8V3WYL
+    BITRISE_TEAM: DT2C2FZ7U2
   - opts:
       is_expand: false
-    BITRISE_PROFILE_ID: 60cff004-0cf3-401a-9658-229c92516f26
+    BITRISE_PROFILE_ID: ad41484e-9c71-484f-9366-565a58111b63
   - opts:
       is_expand: false
     BITRISE_CODE_SIGNING_IDENTITY: Apple Development
